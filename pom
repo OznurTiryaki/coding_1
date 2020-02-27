@@ -1,69 +1,27 @@
- private static WebDriver driver;
+  private static Properties configFile;
 
-    private Driver() {
-    }
-
-    public synchronized static WebDriver getDriver(String browser) {
-        // String browser ==>  it originally comes from xml file to test base class, from test base it comes here
-        if (driver == null) {
-            // first we check if the value from xml file is null or not
-            // if the value from xml file NOT null we use
-            // the value from xml file IS null, we get the browser from properties file
-
-            browser = browser == null ? ConfigurationReader.getProperty("browser") : browser;
-
-            switch (browser) {
-                case "chrome":
-                    WebDriverManager.chromedriver().setup();
-                    driver = new ChromeDriver();
-                    break;
-                case "chromeHeadless":
-                    WebDriverManager.chromedriver().setup();
-                    driver = new ChromeDriver(new ChromeOptions().setHeadless(true));
-                    break;
-
-                case "firefox":
-                    WebDriverManager.firefoxdriver().setup();
-                    driver = new FirefoxDriver();
-                    break;
-                case "firefoxHeadless":
-                    WebDriverManager.firefoxdriver().setup();
-                    driver = new FirefoxDriver(new FirefoxOptions().setHeadless(true));
-                    break;
-
-                case "ie":
-                    if (System.getProperty("os.name").toLowerCase().contains("mac"))
-                        throw new WebDriverException("You are operating Mac OS which doesn't support Internet Explorer");
-                    WebDriverManager.iedriver().setup();
-                    driver = new InternetExplorerDriver();
-                    break;
-
-                case "edge":
-                    WebDriverManager.edgedriver().setup();
-                    driver = new EdgeDriver();
-                    break;
-                case "safari":
-                    if (System.getProperty("os.name").toLowerCase().contains("windows"))
-                        throw new WebDriverException("You are operating Windows OS which doesn't support Safari");
-                    WebDriverManager.getInstance(SafariDriver.class).setup();
-                    driver = new SafariDriver();
-                    break;
-                default:
-                    throw new RuntimeException("Illegal browser type!");
-            }
+    static {
+        try {
+            //path to our .properties file
+            //MIGHT BE WRONG PATH HERE, PAY ATTENTION
+            String path = "configuration.properties";
+            //we create object of input stream to access file
+            System.out.println(path);
+            //provides access to file
+            FileInputStream input = new FileInputStream(path);
+            //initialize configFile
+            configFile = new Properties();
+            //load properties file
+            configFile.load(input);
+            //close input stream
+            input.close();
+        } catch (Exception e){
+            e.printStackTrace();
         }
-        return driver;
     }
 
-    public static WebDriver getDriver() {
-
-        return getDriver(null);
-    }
-
-    public  static void closeDriver() {
-        if (driver != null) {
-            driver.quit();
-            driver = null;
-        }
+    public static String getProperty(String key){
+        return configFile.getProperty(key);
     }
 }
+
