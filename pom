@@ -1,22 +1,27 @@
-  //default HOOK runs for any scenario
-    @Before
-    public void setup(Scenario scenario){
-        System.out.println(scenario.getSourceTagNames());
-        System.out.println(scenario.getName());
-        System.out.println("BEFORE");
-        Driver.getDriver().manage().window().maximize();
-        Driver.getDriver().manage().timeouts().implicitlyWait(5, TimeUnit.SECONDS);
-        Driver.getDriver().get(ConfigurationReader.getProperty("url" + ConfigurationReader.getProperty("environment")));
-    }
+import cucumber.api.CucumberOptions;
+import cucumber.api.junit.Cucumber;
+import org.junit.runner.RunWith;
 
-    @After
-    public void teardown(Scenario scenario){
-        if(scenario.isFailed()){
-            TakesScreenshot takesScreenshot = (TakesScreenshot) Driver.getDriver();
-            byte[] image = takesScreenshot.getScreenshotAs(OutputType.BYTES);
-            //will attach screenshot into report
-            scenario.embed(image, "image/png");
-        }
-        Driver.closeDriver();
-        System.out.println("AFTER");
-    }
+@RunWith(Cucumber.class)
+@CucumberOptions(
+
+        plugin = {
+                "json:target/cucumber.json",
+                "html:target/default-cucumber-reports",
+                "rerun:target/rerun.txt"
+        },
+        tags = {"@negative or @storemanager"},
+        features = {"src/test/resources/features" //to specify where are the features
+        },
+        //feature contains scenarios
+        //every scenario is like a test
+        //where is the implementation for features
+        glue = {"com/vytrack/step_definitions"},
+        //dry run - to generate step definitions automatically
+        //you will see them in the console output
+        dryRun = true
+
+)
+public class CukesRunner{
+
+}
