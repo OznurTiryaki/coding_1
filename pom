@@ -1,28 +1,24 @@
-#######BROWSER CONFIG
-browser=chrome
-environment=qa1
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration status="WARN">
+    <Appenders>
+        <Console name="Console" target="SYSTEM_OUT">
+            <PatternLayout pattern="%d{YYYY-MM-dd HH:mm:ss} [%t] %-5p %c{1}:%L - %msg%n"/>
+        </Console>
 
-######CREDENTIALS
-storemanagerusername=storemanager85
-storemanagerpassword=UserUser123
+        <RollingFile name="RollingFile" filename="log/automation.log"
+                     filepattern="${logPath}/%d{YYYYMMddHHmmss}-fargo.log">
+            <PatternLayout pattern="%d{YYYY-MM-dd HH:mm:ss} [%t] %-5p %c{1}:%L - %msg%n"/>
+            <Policies>
+                <SizeBasedTriggeringPolicy size="100 MB"/>
+            </Policies>
+            <DefaultRolloverStrategy max="20"/>
+        </RollingFile>
 
-salesmanagerusername=salesmanager110
-salesmanagerpassword=UserUser123
-
-driverusername=user160
-driverpassword=UserUser123
-
-#####Environments
-urlqa1=http://qa1.vytrack.com/user/login
-urlqa2=http://qa2.vytrack.com/user/login
-urlqa3=http://qa3.vytrack.com/user/login
-
-#########WAITS
-#short wait mostly used for explicit wait
-SHORT_WAIT=5
-MEDIUM_WAIT=15
-LONG_WAIT=30
-explicitwait=5
-implicitwait=5
-
-
+    </Appenders>
+    <Loggers>
+        <Root level="info">
+            <AppenderRef ref="Console"/>
+            <AppenderRef ref="RollingFile"/>
+        </Root>
+    </Loggers>
+</Configuration>
