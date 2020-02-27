@@ -1,24 +1,69 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<Configuration status="WARN">
-    <Appenders>
-        <Console name="Console" target="SYSTEM_OUT">
-            <PatternLayout pattern="%d{YYYY-MM-dd HH:mm:ss} [%t] %-5p %c{1}:%L - %msg%n"/>
-        </Console>
+ private static WebDriver driver;
 
-        <RollingFile name="RollingFile" filename="log/automation.log"
-                     filepattern="${logPath}/%d{YYYYMMddHHmmss}-fargo.log">
-            <PatternLayout pattern="%d{YYYY-MM-dd HH:mm:ss} [%t] %-5p %c{1}:%L - %msg%n"/>
-            <Policies>
-                <SizeBasedTriggeringPolicy size="100 MB"/>
-            </Policies>
-            <DefaultRolloverStrategy max="20"/>
-        </RollingFile>
+    private Driver() {
+    }
 
-    </Appenders>
-    <Loggers>
-        <Root level="info">
-            <AppenderRef ref="Console"/>
-            <AppenderRef ref="RollingFile"/>
-        </Root>
-    </Loggers>
-</Configuration>
+    public synchronized static WebDriver getDriver(String browser) {
+        // String browser ==>  it originally comes from xml file to test base class, from test base it comes here
+        if (driver == null) {
+            // first we check if the value from xml file is null or not
+            // if the value from xml file NOT null we use
+            // the value from xml file IS null, we get the browser from properties file
+
+            browser = browser == null ? ConfigurationReader.getProperty("browser") : browser;
+
+            switch (browser) {
+                case "chrome":
+                    WebDriverManager.chromedriver().setup();
+                    driver = new ChromeDriver();
+                    break;
+                case "chromeHeadless":
+                    WebDriverManager.chromedriver().setup();
+                    driver = new ChromeDriver(new ChromeOptions().setHeadless(true));
+                    break;
+
+                case "firefox":
+                    WebDriverManager.firefoxdriver().setup();
+                    driver = new FirefoxDriver();
+                    break;
+                case "firefoxHeadless":
+                    WebDriverManager.firefoxdriver().setup();
+                    driver = new FirefoxDriver(new FirefoxOptions().setHeadless(true));
+                    break;
+
+                case "ie":
+                    if (System.getProperty("os.name").toLowerCase().contains("mac"))
+                        throw new WebDriverException("You are operating Mac OS which doesn't support Internet Explorer");
+                    WebDriverManager.iedriver().setup();
+                    driver = new InternetExplorerDriver();
+                    break;
+
+                case "edge":
+                    WebDriverManager.edgedriver().setup();
+                    driver = new EdgeDriver();
+                    break;
+                case "safari":
+                    if (System.getProperty("os.name").toLowerCase().contains("windows"))
+                        throw new WebDriverException("You are operating Windows OS which doesn't support Safari");
+                    WebDriverManager.getInstance(SafariDriver.class).setup();
+                    driver = new SafariDriver();
+                    break;
+                default:
+                    throw new RuntimeException("Illegal browser type!");
+            }
+        }
+        return driver;
+    }
+
+    public static WebDriver getDriver() {
+
+        return getDriver(null);
+    }
+
+    public  static void closeDriver() {
+        if (driver != null) {
+            driver.quit();
+            driver = null;
+        }
+    }
+}
